@@ -28,6 +28,8 @@ router.post("/adminsignup", async (req, res) => {
             number
         });
 
+        // Save admin to database
+        
         await newAdmin.save();
         return res.status(201).json({ status: true, message: "Admin registered" });
     } catch (error) {

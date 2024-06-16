@@ -1,57 +1,43 @@
 // Importing necessary modules
-import express from "express";
+import express from 'express';
 import dotenv from 'dotenv';
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser'; // For Cookies
 import adminRoutes from './routes/admin-router.js'; // Use import for ES modules
+import { UserRouter } from './routes/user.js';
 
-// Importing environment variables from .env file
+// Initialize dotenv
 dotenv.config();
 
-// Creating an instance of express application
+// Instantiate Express app
 const app = express();
-
-// Importing routers
-import { UserRouter } from "./routes/user.js";
-
-import { AdminRouter } from "./routes/admin.js";
-
-
 
 // Middleware
 app.use(express.json()); // Parsing JSON bodies
+app.use(cookieParser()); // Parse cookies
 
-// Enable CORS with credentials
+// CORS Options
 const corsOptions = {
-    origin: (origin, callback) => {
-        // Reflect the origin or use '*' to allow any origin
-        callback(null, origin || '*');
-    },
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    origin: ["https://mern-front-silk.vercel.app"],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+    optionsSuccessStatus: 200 
 };
 
-app.use(cors(corsOptions));
-
-app.use(cookieParser()); // Parse cookies
+app.use(cors(corsOptions)); // Enable CORS with credentials
 
 // Routes
 app.use('/auth', UserRouter); // Using UserRouter for paths starting with /auth
-app.use('/auth', AdminRouter); // Using UserRouter for paths starting with /auth
+app.use('/api/admin', adminRoutes); // Use correct variable name and import statement
 
-app.get('/',(req,resp)=>{
-    resp.send("Hi I am Backend Developer Vipin.....");
-})
-
-
-// Routes for the Admin Cases 
-app.use("/api/admin", adminRoutes); // Use correct variable name and import statement
+app.get('/', (req, res) => {
+    res.send("Hi I am Backend Developer Vipin.....");
+});
 
 // Connecting to MongoDB with error handling
-mongoose.connect('mongodb+srv://satyamnoidetechnology:Mongodb2050%40@cluster0.cyzppni.mongodb.net/authentication', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/authentication', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
